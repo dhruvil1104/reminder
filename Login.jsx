@@ -3,13 +3,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [error, setError] = useState(""); // Error state
+  const [form, setForm] = useState({email: "", password: "",});
+  const [error, setError] = useState(""); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,29 +29,17 @@ const Login = () => {
       return;
     }  
 
-    setError(""); // Clear error before making request
-
-    try {
-      const response = await axios.post(
-        "http://localhost:4002/api/login",
-        form
-      );
-
-      const data = await response.data; // Response JSON parse karein
-
-      if (response.status !== 200) {
-        throw new Error(data.message || "Failed to login");
-      }
-
+     try {
+      setError("");
+      const { data } = await axios.post(`${API_URL}/login`, form);
+      
       if (data.token) {
         localStorage.setItem("token", data.token);
-        console.log("Token successfully saved!");
         setForm({ email: "", password: "" });
-        navigate("/Table"); // Successful login ke baad navigate karein
+        navigate("/Table");
       }
-    } catch (error) {
-      console.error("Login Error:", error);
-      setError(error.message); // Server se aayi error message show karein
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -129,6 +114,23 @@ const Login = () => {
 };
 
 export default Login;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // const handleLogin = async (e) => {
 //   e.preventDefault();

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [form, setForm] = useState({ email: "", password: "" });
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [error, setError] = useState("");
@@ -20,33 +21,16 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!agreeToTerms) {
-      setError("You must agree to the terms and conditions.");
-      return;
-    }
-
+    if (!agreeToTerms) return setError("You must agree to the terms and conditions.");
+    
     try {
       setLoading(true);
-      setError(""); // Reset error state
-
-      const response = await axios.post("http://localhost:4002/api/signup",form, {
-        headers: {},
-       
-      });
-
-      const data = await response.data;
-      console.log(data);
-
-      if (response.status !== 200) {
-        throw new Error(data.message || "Signup failed. Please try again.");
-      }
-
+      setError("");
+      const { data } = await axios.post(`${API_URL}/signup`, form);
       console.log("Signup successful!", data);
-
       navigate("/Login");
     } catch (error) {
-      setError(error.message);
+      setError(error.response?.data?.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -95,7 +79,6 @@ const Signup = () => {
             />
           </div>
 
-          {/* Checkbox for terms and conditions */}
           <div className="mb-6 flex items-center">
             <input
               type="checkbox"
