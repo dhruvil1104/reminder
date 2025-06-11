@@ -1,68 +1,38 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [agreeToTerms, setAgreeToTerms] = useState(false); // Checkbox state
-  const [error, setError] = useState(""); // Error message state
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: value,
-    });
+    setForm({ ...form, [name]: value });
   };
 
-  const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e) => { 
     setAgreeToTerms(e.target.checked);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validation
-    if (!form.email.trim()) {
-      setError("Email is required");
-      return;
-    }
-
-    if (!form.password.trim()) {
-      setError("Password is required");
-      return;
-    }
-
-    if (!agreeToTerms) {
-      setError("You must agree to the terms and conditions");
-      return;
-    }
-
-    setError(""); // Clear error before sending request
-
+    if (!agreeToTerms) return setError("You must agree to the terms and conditions.");
+    
     try {
-      const response = await fetch("http://localhost:4002/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      if (response.ok) {
-        const obj = await response.json();
-        setUserData(obj);
-        console.log("Data successfully saved!");
-        setForm({ email: "", password: "" }); // Reset form
-        setAgreeToTerms(false);
-        // navigate("/Table");
-      } else {
-        throw new Error("Failed to save data");
-      }
+      setLoading(true);
+      setError("");
+      const { data } = await axios.post(`${API_URL}/signup`, form);
+      console.log("Signup successful!", data);
+      navigate("/Login");
     } catch (error) {
-      console.error("Error:", error);
-      setError("Signup failed. Please try again.");
+      setError(error.response?.data?.message || "Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,7 +79,6 @@ const Signup = () => {
             />
           </div>
 
-          {/* Checkbox for terms and conditions */}
           <div className="mb-6 flex items-center">
             <input
               type="checkbox"
@@ -129,10 +98,12 @@ const Signup = () => {
           <button
             type="submit"
             className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-lg shadow-lg transform hover:scale-105 transition duration-300"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
+
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}

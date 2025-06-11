@@ -1,14 +1,12 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [error, setError] = useState(""); // Error state
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,30 +29,20 @@ const Login = () => {
       return;
     }
 
-    setError(""); // Clear error before making request
-
     try {
-      const response = await fetch("http://localhost:4002/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      setError("");
+      const { data } = await axios.post(`${API_URL}/login`, form, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-
-      const data = await response.json(); // Response JSON parse karein
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to login"); // Backend se aaya error message dikhayein
-      }
-
       if (data.token) {
         localStorage.setItem("token", data.token);
-        console.log("Token successfully saved!");
         setForm({ email: "", password: "" });
-        navigate("/Table"); // Successful login ke baad navigate karein
+        navigate("/table");
       }
-    } catch (error) {
-      console.error("Login Error:", error);
-      setError(error.message); // Server se aayi error message show karein
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -129,3 +117,45 @@ const Login = () => {
 };
 
 export default Login;
+
+// const handleLogin = async (e) => {
+//   e.preventDefault();
+
+//   if (!form.email.trim()) {
+//     setError("Email is required");
+//     return;
+//   }
+
+//   if (!form.password.trim()) {
+//     setError("Password is required");
+//     return;
+//   }
+
+//   setError(""); // Clear error before making request
+
+//   try {
+//     const response = await fetch("http://localhost:4002/api/login", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(form),
+//     });
+
+//     const data = await response.json(); // Response JSON parse karein
+
+//     if (!response.ok) {
+//       throw new Error(data.message || "Failed to login"); // Backend se aaya error message dikhayein
+//     }
+
+//     if (data.token) {
+//       localStorage.setItem("token", data.token);
+//       console.log("Token successfully saved!");
+//       setForm({ email: "", password: "" });
+//       navigate("/Table"); // Successful login ke baad navigate karein
+//     }
+//   } catch (error) {
+//     console.error("Login Error:", error);
+//     setError(error.message); // Server se aayi error message show karein
+//   }
+// };

@@ -1,46 +1,88 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
-import ResponsiveForm from "./components/Form";
 import ActivityTable from "./components/ActivityTable";
-import Table from "./components/table";
+import Table from "./components/Table";
 import ActivityAdd from "./components/ActivityAdd";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Assignto from "./components/Assignto";
+import AssignToMe from "./components/AssignToMe";
+import CreatedByMe from "./components/CreatedByMe";
+import AddTask from "./components/AddTask";
+import MainLayout from "./layouts/MainLayout";
+import Categories from "./components/Categories";
+import InsuranceForm from "./components/InsuranceForm";
+import PolicyTable from "./components/PolicyTable";
+import DataGridPremiumDemo from "./components/TableUI";
+
 
 function App() {
   const router = createBrowserRouter([
-    
     {
       path: "/",
-      element: <Login />, // Default route
+      element: <Login />,
     },
     {
-      path: "Login",
-      element: <Login />, // Default route
+      path: "/login",
+      element: <Login />,
     },
     {
-      path: "Signup",
-      element: <Signup />, // Default route
-    },
-    // {
-    //   path: "/",
-    //   element: <Table />, // Default route
-    // },
-    {
-      path: "/table",
-      element: <Table />,
+      path: "/InsuranceForm",
+      element: <InsuranceForm />,
     },
     {
-      path: "/ResponsiveForm",
-      element: <ResponsiveForm />,
+      path: "/PolicyTable",
+      element: <PolicyTable />,
     },
     {
-      path: "/ActivityTable/:userId",
-      element: <ActivityTable />, // Ensure this route matches your navigate path
+      path: "/signup",
+      element: <Signup />,
     },
     {
-      path: "/ActivityAdd/:id",
-      element: <ActivityAdd />, // Ensure this route matches your navigate path
+      path: "/DataGridPremiumDemo",
+      element: <DataGridPremiumDemo />,
+    },
+    {
+      path: "AddTask",
+      element: <AddTask />,
+    },
+    {
+      path: "ActivityAdd/:id",
+      element: <ActivityAdd />,
+    },
+
+    {
+      path: "Assignto/:id",
+      element: <Assignto />,
+    },
+
+    {
+      path: "/",
+      element: <MainLayout />,
+      children: [
+        {
+          path: "table",
+          element: <Table />,
+        },
+        {
+          path: "Categories",
+          element: <Categories />,
+        },
+
+        {
+          path: "ActivityTable/:userId",
+          element: <ActivityTable />,
+        },
+
+        {
+          path: "CreatedByMe",
+          element: <CreatedByMe />,
+        },
+        {
+          path: "AssignToMe",
+          element: <AssignToMe />,
+        },
+      ],
     },
   ]);
 
